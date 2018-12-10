@@ -3,13 +3,16 @@ import java.util.Map;
 
 public class Ballot {
 	private Map<Integer, String> prioritizedCandidatesMap = new HashMap<>();
-	private int activeVotes;
+	private int activeVotesTotal;
+	private int activeVote;
 
 	public Ballot(char[] charArray) {
-		activeVotes = charArray.length;
-		for(int i = 0; i<activeVotes; i++){
+		activeVotesTotal = charArray.length;
+		activeVote = 1;
+		for(int i = 0; i< activeVotesTotal; i++){
 			prioritizedCandidatesMap.put(i+1, String.valueOf(charArray[i]));
 		}
+
 		System.out.println(prioritizedCandidatesMap);
 	}
 
@@ -19,11 +22,22 @@ public class Ballot {
 	}
 
 
-	public Map<Integer, String> getPrioritizedCandidatesMap() {
-		return prioritizedCandidatesMap;
+	public String getCandidateWithFirstPriority() {
+		return prioritizedCandidatesMap.get(1);
 	}
 
 	public String getVoteByPriority(Integer i){
 		return prioritizedCandidatesMap.get(i);
 	}
+
+	public String getNextPreferenceFromBallot(){
+		return prioritizedCandidatesMap.get(++activeVote);
+	}
+
+	public boolean isExhausted(){
+		return prioritizedCandidatesMap.keySet().size() < activeVote + 1;
+	}
+
+
+
 }

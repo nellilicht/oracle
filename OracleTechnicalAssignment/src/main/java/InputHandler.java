@@ -34,7 +34,7 @@ public class InputHandler {
 			userInput = scanner.nextLine(); // Read first time
 
 			if(userInput.equals("tally")){
-				voteHandler.calculateVotes(ballotMap);
+				voteHandler.countVotes(ballotMap);
 				run = false;
 			} else {
 
