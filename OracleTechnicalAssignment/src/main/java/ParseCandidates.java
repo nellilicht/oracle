@@ -1,4 +1,8 @@
+import sun.misc.ClassLoaderUtil;
+
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,7 +24,9 @@ public class ParseCandidates {
 	private List<String> readCandidatesFromFile(String fileName) {
 		List<String> list = new ArrayList<>();
 
-		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
+		URL fileToRead = ParseCandidates.class.getResource(fileName);
+
+		try (Stream<String> stream = Files.lines(Paths.get(fileToRead.toURI()))) {
 
 			list =  stream
 					.map(s -> s.trim())
@@ -28,6 +34,8 @@ public class ParseCandidates {
 					.collect(Collectors.toList());
 
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 
