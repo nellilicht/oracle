@@ -1,3 +1,5 @@
+package util;
+
 public interface ConsoleIO {
 	String getUserInput();
 
