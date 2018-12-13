@@ -9,7 +9,7 @@ public class InputHandler {
 	//user input = ballot and results, list or map
 	private ConsoleIO io;
 	private Set<String> validCandidatesLabels;
-	private Map<String, String> candidatesMap;
+	private Map<String, String> labelsAndCandidatesMap;
 	private boolean run = true;
 
 	private Map<Integer, Ballot> ballotMap = new HashMap<>();
@@ -19,13 +19,13 @@ public class InputHandler {
 
 	public InputHandler(Map<String, String> candidatesList, ConsoleIO io ){
 		this.validCandidatesLabels = candidatesList.keySet();
-		this.candidatesMap = candidatesList;
+		this.labelsAndCandidatesMap = candidatesList;
 		this.io = io;
 	}
 
 	protected void readInput(){
 		while (run) {
-			displayCandidatesList(getCandidatesMap());
+			displayCandidatesList(getLabelsAndCandidatesMap());
 
 			io.printLine("Type in the labels in the order of your preference!");
 
@@ -33,12 +33,12 @@ public class InputHandler {
 
 			char[] votes = parseInputToUniqueLabels(userInput);
 
-			if(userInput.equals("tally")){
-				if(votes.length <2){
+			if(userInput.toUpperCase().equals("TALLY")){
+				if(ballotMap.keySet().size() <2){
 					io.printLine("Not enough votes to calculate!");
 					continue;
 				}
-				voteHandler.countVotes(ballotMap);
+				getVoteHandler().countVotes(ballotMap);
 				run = false;
 			} else {
 
@@ -55,25 +55,37 @@ public class InputHandler {
 
 				}
 
-				io.printLine("Enter another vote? [Y/N]");
-				String addVote = io.getUserInput();
+				run = enterAnotherVote(io, ballotMap.keySet().size());
 
-				if (addVote.toUpperCase().equals("N") || addVote.toUpperCase().equals("TALLY")) {
-					if(votes.length > 2){
-						voteHandler.countVotes(ballotMap);
-					}
-					run = false;
-				} else if(addVote.toUpperCase().equals("Y")) {
-					continue;
-				} else {
-					io.printLine("Not recognized command. Exiting program!");
-					System.exit(1);
-				}
 			}
 		}
 
 		io.close();
 
+	}
+
+	protected boolean enterAnotherVote(ConsoleIO io, int votesLenght) {
+		boolean addAnotherVote = true;
+
+		while (addAnotherVote) {
+			io.printLine("Enter another vote? [Y/N/TALLY]");
+			String addVote = io.getUserInput();
+
+
+			if (addVote.toUpperCase().equals("N") || addVote.toUpperCase().equals("TALLY")) {
+				if (ballotMap.keySet().size() > 2) {
+					getVoteHandler().countVotes(ballotMap);
+				} else {
+					io.printLine("Too few candidates to calculate! Exiting progam!");
+				}
+				return false;
+			} else if (addVote.toUpperCase().equals("Y")) {
+				return true;
+			} else {
+				io.printLine("Not recognized command!");
+			}
+		}
+		return false;
 	}
 
 
@@ -85,8 +97,8 @@ public class InputHandler {
 
 	protected boolean validateLabels(char[] votes){
 		boolean validation = true;
-		for (char c : votes) {
-			if (!validCandidatesLabels.contains(String.valueOf(c))) {
+		for (char label : votes) {
+			if (!validCandidatesLabels.contains(String.valueOf(label).toUpperCase())) {
 				validation = false;
 				break;
 			}
@@ -107,7 +119,7 @@ public class InputHandler {
 
 	}
 
-	private char[] getUniqueLabelsCharArray(char[] array) {
+	protected char[] getUniqueLabelsCharArray(char[] array) {
 		String _array = "";
 		for(int i = 0; i < array.length; i++) {
 			if(_array.indexOf(array[i]) == -1){
@@ -121,7 +133,13 @@ public class InputHandler {
 		return ballotMap;
 	}
 
-	public Map<String, String> getCandidatesMap() {
-		return candidatesMap;
+	public Map<String, String> getLabelsAndCandidatesMap() {
+		return labelsAndCandidatesMap;
 	}
+
+
+	public VoteHandler getVoteHandler() {
+		return voteHandler;
+	}
+
 }
