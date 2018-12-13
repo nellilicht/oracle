@@ -58,8 +58,10 @@ public class InputHandler {
 				io.printLine("Enter another vote? [Y/N]");
 				String addVote = io.getUserInput();
 
-				if (addVote.toUpperCase().equals("N")||addVote.toUpperCase().equals("TALLY")) {
-					voteHandler.countVotes(ballotMap);
+				if (addVote.toUpperCase().equals("N") || addVote.toUpperCase().equals("TALLY")) {
+					if(votes.length > 2){
+						voteHandler.countVotes(ballotMap);
+					}
 					run = false;
 				} else if(addVote.toUpperCase().equals("Y")) {
 					continue;

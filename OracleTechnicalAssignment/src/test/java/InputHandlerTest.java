@@ -1,9 +1,8 @@
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import util.FakeIO;
@@ -15,11 +14,17 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InputHandlerTest {
 	private static final Map<String, String> testCandidatesList;
+
+	@Mock
+	VoteHandler voteHandler;
+
 	InputHandler inputHandler;
+
 
 	static
 	{
@@ -29,26 +34,32 @@ public class InputHandlerTest {
 		testCandidatesList.put("C", "MOVIE NIGHT");
 		testCandidatesList.put("J", "MUSEUM VISIT");
 	}
+
 	@Before
 	public void setUp(){
-	inputHandler = mock(InputHandler.class);
+		initMocks(this);
+		inputHandler = mock(InputHandler.class);
+	}
+
+	private void setUpFakeInput(String[] input) {
+		FakeIO fakeIO = new FakeIO(input);
+		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
 	}
 
 	@Test
 	public void inputWithWhitespaceShouldBeRead(){
-		FakeIO fakeIO = new FakeIO("A B", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"A B", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
+		verify(voteHandler, times(0)).countVotes(any());
 		Assert.assertEquals(1, inputHandler.getBallotMap().keySet().size());
-
 	}
+
 
 	@Test
 	public void inputWithOutWhitespaceShouldBeRead(){
-		FakeIO fakeIO = new FakeIO("AB", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"AB", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -58,8 +69,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void inputWithLeadingAndTrailingWhitespaceShouldBeRead(){
-		FakeIO fakeIO = new FakeIO(" AB ", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{" AB ", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -69,8 +79,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void multipleVotesShouldBeRead(){
-		FakeIO fakeIO = new FakeIO("AB", "Y", "AC", "Y", "CA", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"AB", "Y", "AC", "Y", "CA", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(3)).addVotesToBallot(any());
@@ -80,8 +89,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void specialCharactersShouldNotBeRead(){
-		FakeIO fakeIO = new FakeIO("AB*",  "Y", "??", "Y", "&&", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"AB*",  "Y", "??", "Y", "&&", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(0)).addVotesToBallot(any());
@@ -91,8 +99,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void notListedCandidatesShouldNotBeRead(){
-		FakeIO fakeIO = new FakeIO("ABX",  "Y", "AB*", "Y", "AB", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"ABX",  "Y", "AB*", "Y", "AB", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -104,8 +111,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void emptyStringShouldNotBeRead(){
-		FakeIO fakeIO = new FakeIO("           ",  "Y", "AB", "N");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"           ",  "Y", "AB", "N"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -117,9 +123,17 @@ public class InputHandlerTest {
 
 	@Test
 	public void calculationOfVotesShouldBeInvoked(){
-		FakeIO fakeIO = new FakeIO("BA",  "Y", "AB", "N","tally");
-		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		setUpFakeInput(new String[]{"BA",  "Y", "AB", "N","tally"});
 		inputHandler.readInput();
+
+	}
+	@Test
+	public void inputWithTooFewVotesShouldNotInitiateCounting(){
+		setUpFakeInput(new String[]{"AB", "N"});
+		inputHandler.readInput();
+
+		verify(inputHandler, times(1)).addVotesToBallot(any());
+		verify(voteHandler, times(0)).countVotes(any());
 
 	}
 
