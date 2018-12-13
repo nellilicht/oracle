@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import util.FakeIO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -111,6 +112,14 @@ public class InputHandlerTest {
 		Assert.assertEquals(1, inputHandler.getBallotMap().keySet().size());
 		Assert.assertEquals("A", inputHandler.getBallotMap().get(1).getVoteByPriority(1));
 		Assert.assertEquals("B", inputHandler.getBallotMap().get(1).getVoteByPriority(2));
+
+	}
+
+	@Test
+	public void calculationOfVotesShouldBeInvoked(){
+		FakeIO fakeIO = new FakeIO("BA",  "Y", "AB", "N","tally");
+		inputHandler = Mockito.spy(new InputHandler(testCandidatesList, fakeIO));
+		inputHandler.readInput();
 
 	}
 

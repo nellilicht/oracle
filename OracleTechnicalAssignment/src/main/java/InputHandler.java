@@ -1,3 +1,5 @@
+import util.ConsoleIO;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -29,12 +31,17 @@ public class InputHandler {
 
 			userInput = io.getUserInput(); // Read first time
 
+			char[] votes = parseInputToUniqueLabels(userInput);
+
 			if(userInput.equals("tally")){
+				if(votes.length <2){
+					io.printLine("Not enough votes to calculate!");
+					continue;
+				}
 				voteHandler.countVotes(ballotMap);
 				run = false;
 			} else {
 
-				char[] votes = parseInput(userInput);
 
 				if (!userInput.trim().matches("[a-zA-Z]+(\\s.*)?")) {
 					io.printLine("Incorrect input!");
@@ -51,7 +58,8 @@ public class InputHandler {
 				io.printLine("Enter another vote? [Y/N]");
 				String addVote = io.getUserInput();
 
-				if (addVote.toUpperCase().equals("N")) {
+				if (addVote.toUpperCase().equals("N")||addVote.toUpperCase().equals("TALLY")) {
+					voteHandler.countVotes(ballotMap);
 					run = false;
 				} else if(addVote.toUpperCase().equals("Y")) {
 					continue;
@@ -86,7 +94,7 @@ public class InputHandler {
 	}
 
 	//char array keeps the order of elements
-	protected char[] parseInput(String votes){
+	protected char[] parseInputToUniqueLabels(String votes){
 		votes = votes.replaceAll("\\s","").toUpperCase();
 		return getUniqueLabelsCharArray(votes.toCharArray());
 	}
