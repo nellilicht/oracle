@@ -12,15 +12,12 @@ public class Ballot {
 		for(int i = 0; i< activeVotesTotal; i++){
 			prioritizedCandidatesMap.put(i+1, String.valueOf(charArray[i]));
 		}
-
-		System.out.println(prioritizedCandidatesMap);
 	}
 
 	@Override
 	public String toString() {
 		return prioritizedCandidatesMap.toString();
 	}
-
 
 	public String getCandidateWithFirstPriority() {
 		return prioritizedCandidatesMap.get(1);
@@ -38,6 +35,13 @@ public class Ballot {
 		return prioritizedCandidatesMap.keySet().size() < activeVote + 1;
 	}
 
+	public Map<Integer, String> getPrioritizedCandidatesMap() {
+		return prioritizedCandidatesMap;
+	}
+
+	public int getActiveVote() {
+		return activeVote;
+	}
 
 
 }
