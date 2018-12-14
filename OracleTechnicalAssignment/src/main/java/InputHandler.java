@@ -13,7 +13,7 @@ public class InputHandler {
 	private boolean run = true;
 
 	private Map<Integer, Ballot> ballotMap = new HashMap<>();
-	private VoteHandler voteHandler = new VoteHandler();
+	private VoteHandler voteHandler;
 
 	private String userInput;
 
@@ -21,9 +21,10 @@ public class InputHandler {
 		this.validCandidatesLabels = candidatesList.keySet();
 		this.labelsAndCandidatesMap = candidatesList;
 		this.io = io;
+		voteHandler = new VoteHandler(io);
 	}
 
-	protected void readInput(){
+	protected void readInput() throws IllegalArgumentException{
 		while (run) {
 			displayCandidatesList(getLabelsAndCandidatesMap());
 
@@ -68,15 +69,15 @@ public class InputHandler {
 		boolean addAnotherVote = true;
 
 		while (addAnotherVote) {
-			io.printLine("Enter another vote? [Y/N/TALLY]");
+			io.printLine("Enter another vote? [Y/TALLY]");
 			String addVote = io.getUserInput();
 
 
-			if (addVote.toUpperCase().equals("N") || addVote.toUpperCase().equals("TALLY")) {
+			if (addVote.toUpperCase().equals("TALLY")) {
 				if (ballotMap.keySet().size() > 2) {
 					getVoteHandler().countVotes(ballotMap);
 				} else {
-					io.printLine("Too few candidates to calculate! Exiting progam!");
+					io.printLine("Too few votes to calculate! Exiting progam!");
 				}
 				return false;
 			} else if (addVote.toUpperCase().equals("Y")) {
