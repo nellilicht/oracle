@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Ballot {
 	private Map<Integer, String> prioritizedCandidatesMap = new HashMap<>();
@@ -19,20 +20,39 @@ public class Ballot {
 		return prioritizedCandidatesMap.toString();
 	}
 
-	public String getCandidateWithFirstPriority() {
-		return prioritizedCandidatesMap.get(1);
+	public String getCandidateWithPriority(int priority) {
+		return prioritizedCandidatesMap.get(priority);
 	}
 
 	public String getVoteByPriority(Integer i){
 		return prioritizedCandidatesMap.get(i);
 	}
 
-	public String getNextPreferenceFromBallot(){
-		return prioritizedCandidatesMap.get(++activeVote);
+	//Assumes that ballot exhaustion check is done before
+	public String getNextActiveCandidateFromBallot(Set<String> activeCandidates){
+		String candidate = prioritizedCandidatesMap.get(++activeVote);
+
+		boolean suitableCandidate=activeCandidates.contains(candidate.toUpperCase());
+
+		while(!suitableCandidate){
+			candidate = prioritizedCandidatesMap.get(++activeVote);
+			if(activeCandidates.contains(candidate)){
+				suitableCandidate = true;
+			}
+		}
+		return candidate;
 	}
 
-	public boolean isExhausted(){
-		return prioritizedCandidatesMap.keySet().size() < activeVote + 1;
+	public boolean isExhausted(Set<String> activeCandidates){
+		Map<Integer, String> possibleNextVotes = new HashMap<>(prioritizedCandidatesMap);
+
+		for(int i = 0; i<activeVote; i++){
+			possibleNextVotes.remove(activeVote);
+		}
+
+		return 	!(prioritizedCandidatesMap.keySet().size() >= activeVote + 1) ||
+		!(possibleNextVotes.values().stream().distinct().filter(c -> activeCandidates.contains(c.toUpperCase())).count() > 0);
+
 	}
 
 	public Map<Integer, String> getPrioritizedCandidatesMap() {
