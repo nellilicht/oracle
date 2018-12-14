@@ -1,4 +1,3 @@
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -153,7 +152,7 @@ public class InputHandlerTest {
 	}
 
 	@Test
-	public void shouldElliminateWgitespaceValuesFromInputArray(){
+	public void shouldElliminateWhitespaceValuesFromInputArray(){
 		InputHandler iph = new InputHandler(testCandidatesList,fakeIO);
 		assertArrayEquals(new char[] {'A', 'X', 'B'}, iph.parseInputToUniqueLabels("aa xx bb"));
 	}
@@ -168,7 +167,7 @@ public class InputHandlerTest {
 	@Test
 	public void shouldValidateUserInputAgainstExistingLabelsValid(){
 		InputHandler iph = new InputHandler(testCandidatesList,fakeIO);
-		char[] validLabels = {'a', 'a', 'b', 'c', 'c'};
+		char[] validLabels = {'a', 'a', 'b', 'c', 'j'};
 		assertTrue(iph.validateLabels(validLabels));
 	}
 
