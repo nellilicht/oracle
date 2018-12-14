@@ -44,7 +44,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void inputWithWhitespaceShouldBeRead(){
-		setUpFakeInput(new String[]{"A B", "N"});
+		setUpFakeInput(new String[]{"A B", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -55,7 +55,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void inputWithOutWhitespaceShouldBeRead(){
-		setUpFakeInput(new String[]{"AB", "N"});
+		setUpFakeInput(new String[]{"AB", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -65,7 +65,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void inputWithLeadingAndTrailingWhitespaceShouldBeRead(){
-		setUpFakeInput(new String[]{" AB ", "N"});
+		setUpFakeInput(new String[]{" AB ", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -75,7 +75,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void multipleVotesShouldBeRead(){
-		setUpFakeInput(new String[]{"AB", "Y", "AC", "Y", "CA", "N"});
+		setUpFakeInput(new String[]{"AB", "Y", "AC", "Y", "CA", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(3)).addVotesToBallot(any());
@@ -85,7 +85,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void specialCharactersShouldNotBeRead(){
-		setUpFakeInput(new String[]{"AB*",  "Y", "??", "Y", "&&", "N"});
+		setUpFakeInput(new String[]{"AB*",  "Y", "??", "Y", "&&", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(0)).addVotesToBallot(any());
@@ -95,7 +95,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void notListedCandidatesShouldNotBeRead(){
-		setUpFakeInput(new String[]{"ABX",  "Y", "AB*", "Y", "AB", "N"});
+		setUpFakeInput(new String[]{"ABX",  "Y", "AB*", "Y", "AB", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -107,7 +107,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void emptyStringShouldNotBeRead(){
-		setUpFakeInput(new String[]{"           ",  "Y", "AB", "N"});
+		setUpFakeInput(new String[]{"           ",  "Y", "AB", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
@@ -137,7 +137,7 @@ public class InputHandlerTest {
 
 	@Test
 	public void inputWithUnrecognizedCommandShouldExit(){
-		setUpFakeInput(new String[]{"AB", "WWW", "N"});
+		setUpFakeInput(new String[]{"AB", "WWW", "TALLY"});
 		inputHandler.readInput();
 
 		verify(inputHandler, times(1)).addVotesToBallot(any());
