@@ -13,15 +13,15 @@ import java.util.Map;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ParseCandidatesTest {
-	ParseCandidates parseCandidates;
+public class InputFileHandlerTest {
+	InputFileHandler parseCandidates;
 
 	@Before
 	public void setUp()
 	{
 		File file = new File(this.getClass().getResource("test-candidates.txt").getFile());
 		System.out.println(file.getAbsolutePath());
-		parseCandidates = new ParseCandidates();
+		parseCandidates = new InputFileHandler();
 	}
 
 	@Test
@@ -37,13 +37,13 @@ public class ParseCandidatesTest {
 
 	@Test(expected = FileNotFoundException.class)
 	public void invalidFilePathShouldThrowErrorWhenParsing() throws FileNotFoundException {
-		parseCandidates.parseCandidates("xfiles");
+		parseCandidates.parseInputFile("xfiles");
 	}
 
 
 	@Test
 	public void candidatesShouldBeLabelled() throws FileNotFoundException {
-		Map<String, String> test = parseCandidates.parseCandidates("test-candidates.txt");
+		Map<String, String> test = parseCandidates.parseInputFile("test-candidates.txt");
 		Map<String, String> parsedCandidates = new HashMap<String, String>(){{
 			put("A", "WINERY TOUR");
 			put("B", "TEN PIN BOWLING");
