@@ -22,6 +22,7 @@ public final class FakeIO implements ConsoleIO {
 	@Override
 	public void printLine(String line) {
 		output.add(line);
+		System.out.println(line);
 	}
 
 	@Override
