@@ -7,12 +7,12 @@ public class Main {
 
 	public static void main(String args[]) {
 		SysIO io = new SysIO();
-		ParseCandidates fp = new ParseCandidates();
+		InputFileHandler fp = new InputFileHandler();
 		Map<String, String> candidates;
 
 		try {
-			candidates = fp.parseCandidates("candidates.txt");
-			InputHandler inputhandler = new InputHandler(candidates, io);
+			candidates = fp.parseInputFile("candidates.txt");
+			UserInputHandler inputhandler = new UserInputHandler(candidates, io);
 			inputhandler.readInput();
 		} catch (FileNotFoundException e) {
 			io.printLine("Input file was not found!");

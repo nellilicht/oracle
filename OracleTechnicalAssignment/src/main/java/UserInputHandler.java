@@ -1,10 +1,11 @@
+import domain.Ballot;
 import util.ConsoleIO;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class InputHandler {
+public class UserInputHandler {
 
 	//user input = ballot and results, list or map
 	private ConsoleIO io;
@@ -17,7 +18,7 @@ public class InputHandler {
 
 	private String userInput;
 
-	public InputHandler(Map<String, String> candidatesList, ConsoleIO io ){
+	public UserInputHandler(Map<String, String> candidatesList, ConsoleIO io ){
 		this.validCandidatesLabels = candidatesList.keySet();
 		this.labelsAndCandidatesMap = candidatesList;
 		this.io = io;
@@ -56,7 +57,7 @@ public class InputHandler {
 
 				}
 
-				run = enterAnotherVote(io, ballotMap.keySet().size());
+				run = enterAnotherVote(io);
 
 			}
 		}
@@ -65,7 +66,7 @@ public class InputHandler {
 
 	}
 
-	protected boolean enterAnotherVote(ConsoleIO io, int votesLenght) {
+	protected boolean enterAnotherVote(ConsoleIO io) {
 		boolean addAnotherVote = true;
 
 		while (addAnotherVote) {
@@ -74,10 +75,10 @@ public class InputHandler {
 
 
 			if (addVote.toUpperCase().equals("TALLY")) {
-				if (ballotMap.keySet().size() > 2) {
+				if (getBallotMap().keySet().size() > 2) {
 					getVoteHandler().countVotes(ballotMap);
 				} else {
-					io.printLine("Too few votes to calculate! Exiting progam!");
+					io.printLine("Too few votes to calculate!");
 				}
 				return false;
 			} else if (addVote.toUpperCase().equals("Y")) {
@@ -108,15 +109,14 @@ public class InputHandler {
 		return validation;
 	}
 
-	//char array keeps the order of elements
 	protected char[] parseInputToUniqueLabels(String votes){
 		votes = votes.replaceAll("\\s","").toUpperCase();
 		return getUniqueLabelsCharArray(votes.toCharArray());
 	}
 
 	protected void addVotesToBallot(char[] votes){
-		int numberOfBallots = ballotMap.keySet().size();
-		ballotMap.put(numberOfBallots+1, new Ballot(votes));
+		int numberOfBallots = getBallotMap().keySet().size();
+		getBallotMap().put(numberOfBallots+1, new Ballot(votes));
 
 	}
 
