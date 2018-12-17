@@ -29,18 +29,18 @@ public class UserInputHandler {
 		while (run) {
 			displayCandidatesList(getLabelsAndCandidatesMap());
 
-			io.printLine("Type in the labels in the order of your preference!");
+			io.printLine("Please insert the labels of candidates in the order of your preference!");
 
 			userInput = io.getUserInput(); // Read first time
 
 			char[] votes = parseInputToUniqueLabels(userInput);
 
 			if(userInput.toUpperCase().equals("TALLY")){
-				if(ballotMap.keySet().size() <2){
-					io.printLine("Not enough votes to calculate!");
+				if(getBallotMap().keySet().size() <2){
+					io.printLine("Not enough votes to calculate! Please enter more.");
 					continue;
 				}
-				getVoteHandler().countVotes(ballotMap);
+				getVoteHandler().countVotes(getBallotMap());
 				run = false;
 			} else {
 
@@ -49,7 +49,7 @@ public class UserInputHandler {
 					io.printLine("Incorrect input!");
 
 				} else if (!validateLabels(votes)) {
-					io.printLine("Incorrect input! Atleast one of the inserted letters was not in the list");
+					io.printLine("Invalid vote! Atleast one of the inserted letters was not in the list.");
 
 				} else {
 					io.printLine("Thank you for your vote!");
@@ -67,18 +67,16 @@ public class UserInputHandler {
 	}
 
 	protected boolean enterAnotherVote(ConsoleIO io) {
-		boolean addAnotherVote = true;
-
-		while (addAnotherVote) {
+		while (true) {
 			io.printLine("Enter another vote? [Y/TALLY]");
 			String addVote = io.getUserInput();
 
 
 			if (addVote.toUpperCase().equals("TALLY")) {
 				if (getBallotMap().keySet().size() > 2) {
-					getVoteHandler().countVotes(ballotMap);
+					getVoteHandler().countVotes(getBallotMap());
 				} else {
-					io.printLine("Too few votes to calculate!");
+					io.printLine("Too few votes to calculate! Exiting program.");
 				}
 				return false;
 			} else if (addVote.toUpperCase().equals("Y")) {
@@ -87,7 +85,6 @@ public class UserInputHandler {
 				io.printLine("Not recognized command!");
 			}
 		}
-		return false;
 	}
 
 
@@ -122,9 +119,9 @@ public class UserInputHandler {
 
 	protected char[] getUniqueLabelsCharArray(char[] array) {
 		String _array = "";
-		for(int i = 0; i < array.length; i++) {
-			if(_array.indexOf(array[i]) == -1){
-				_array = _array+array[i];
+		for (char c : array) {
+			if (_array.indexOf(c) == -1) {
+				_array = _array + c;
 			}
 		}
 		return _array.toCharArray();

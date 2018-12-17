@@ -28,8 +28,14 @@ public class VoteHandler {
 	}
 
 	public void countVotes(Map<Integer, Ballot> ballotMap){
+		io.printLine("********* STARTING CALCULATIONS **************");
 		this.ballotMap = ballotMap;
 		setNonExhaustedBallots(ballotMap.keySet().size());
+
+		for (Map.Entry<Integer, Ballot> entry : ballotMap.entrySet()) {
+			io.printLine("Vote : " + entry.getKey() + " Ballot : " + entry.getValue());
+		}
+
 		List topLevelCandidates = new ArrayList<>(findAllTopCandidatesFromBallots());
 		Map candidatesMapWithBallots = mapBallotsToCandidates(topLevelCandidates);
 		conductVotingRounds(candidatesMapWithBallots);
@@ -121,16 +127,17 @@ public class VoteHandler {
 	private void reAssignBallots(Map<String, List<Integer>> candidatesMapWithBallotsList,
 			List<String> candidatesWithMinimalVotes) {
 
-		io.printLine("******** Re-assigning ballots ********");
+		io.printLine("******** RE-ASSIGNING BALLOTS ********");
+		io.printLine("Re-assigning candidates: " + candidatesWithMinimalVotes + " ballots.");
 		for (String candidate : candidatesWithMinimalVotes) {
-
-			List<Integer> ballotIds = new ArrayList<>(candidatesMapWithBallotsList.get(candidate));
-
-			for (int ballotId : ballotIds) {
 				//if last candidate remaining
 				if(getBallotMap().keySet().size() == 1){
 					continue;
 				}
+			io.printLine("Candidate: " + candidate + " ballots.");
+			List<Integer> ballotIds = new ArrayList<>(candidatesMapWithBallotsList.get(candidate));
+
+			for (int ballotId : ballotIds) {
 				// need to know where to re-assign the ballot, the next priority (can be non existing candidate)
 				Ballot ballot = getBallotMap().get(ballotId);
 
@@ -174,7 +181,7 @@ public class VoteHandler {
 	protected List<String> findCandidatesWithMinimalVotes(Map<String, List<Integer>> candidatesMapWithBallotsList,
 			int minimalVotes) {
 		return candidatesMapWithBallotsList.entrySet().stream()
-					.filter(entry -> entry.getValue().size() == minimalVotes).map(x -> x.getKey())
+					.filter(entry -> entry.getValue().size() == minimalVotes).map(Map.Entry::getKey)
 					.collect(Collectors.toList());
 	}
 
