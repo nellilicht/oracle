@@ -6,19 +6,22 @@ import java.util.Map;
 public class Main {
 
 	public static void main(String args[]) {
+		SysIO io = new SysIO();
 		ParseCandidates fp = new ParseCandidates();
-		Map<String, String> candidates = null;
+		Map<String, String> candidates;
+
 		try {
 			candidates = fp.parseCandidates("candidates.txt");
+			InputHandler inputhandler = new InputHandler(candidates, io);
+			inputhandler.readInput();
 		} catch (FileNotFoundException e) {
-			System.out.println("Input file was not found!");
+			io.printLine("Input file was not found!");
 			System.exit(1);
 		} catch (IllegalArgumentException e) {
-			System.out.println(e.getMessage());
+			io.printLine(e.getMessage());
 			System.exit(2);
 		}
-		InputHandler inputhandler = new InputHandler(candidates, new SysIO());
-		inputhandler.readInput();
+
 
 	}
 
