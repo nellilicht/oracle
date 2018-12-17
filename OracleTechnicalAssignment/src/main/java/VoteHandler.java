@@ -1,47 +1,46 @@
+import domain.Ballot;
+import util.ConsoleIO;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparingInt;
 
 public class VoteHandler {
-		private Set<String> firstPriorityCandidates = new HashSet<>();
 
-		//holds all ballots and their votes
-		private Map<Integer, Ballot> ballotMap = new HashMap<>();
-		int nonExhaustedBallots;
+	private static final int HIGHEST_VOTE = 1;
+	//holds all ballotsId -s  and their ballots
+	private Map<Integer, Ballot> ballotMap = new HashMap<>();
 
+	int nonExhaustedBallots;
+	private ConsoleIO io;
 
-	public void countVotes(Map<Integer, Ballot> ballotMap) {
-		this.ballotMap = ballotMap;
-		nonExhaustedBallots = ballotMap.keySet().size();
+	private String winnerCandidate;
 
-		ballotMap.entrySet().stream()
-				.forEach(entry -> {
-					System.out.println("Vote : " + entry.getKey() + " Ballot : " + entry.getValue());
-				});
-
-		findAllTopCandidatesFromBallots(ballotMap, firstPriorityCandidates);
-
-		System.out.println("firstPriorityCandidates: "+ firstPriorityCandidates);
-		System.out.println("nonExhaustedBallots: "+nonExhaustedBallots);
-
-
-		round1();
+	public VoteHandler(ConsoleIO io){
+		this.io = io;
 	}
 
-	private void round1(){
-		//filter all option and round priority 1  for them
-		//eliminate exhausted ballots
+	public void countVotes(Map<Integer, Ballot> ballotMap){
+		this.ballotMap = ballotMap;
+		setNonExhaustedBallots(ballotMap.keySet().size());
+		List topLevelCandidates = new ArrayList<>(findAllTopCandidatesFromBallots());
+		Map candidatesMapWithBallots = mapBallotsToCandidates(topLevelCandidates);
+		conductVotingRounds(candidatesMapWithBallots);
 
+	}
+
+	protected Map<String, List<Integer>> mapBallotsToCandidates(List<String> topLevelCandidates){
 		Map<String, List<Integer>> candidatesMapWithBallots = new HashMap();
-		for(String candidate : firstPriorityCandidates){
-			for( Integer entry : ballotMap.keySet()){
-				 if (ballotMap.get(entry).getVoteByPriority(1).equals(candidate)){
+		for(String candidate : topLevelCandidates){
+			for( Integer entry : getBallotMap().keySet()){
+				 if (getBallotMap().get(entry).getVoteByPriority(HIGHEST_VOTE).equals(candidate)){
 				 	if(candidatesMapWithBallots.get(candidate) == null){
 						List<Integer> entryList = new ArrayList<>();
 						entryList.add(entry);
@@ -53,80 +52,159 @@ public class VoteHandler {
 
 			}
 		}
-		String winner = calculateWinner(candidatesMapWithBallots);
 
-		while(winner.isEmpty()){
-			System.out.println("no winner");
-			Map<String, List<Integer>> reAssignedCandidatesMapWithBallots = reAssignBallots(candidatesMapWithBallots);
-			winner = calculateWinner(reAssignedCandidatesMapWithBallots);
+		return candidatesMapWithBallots;
+	}
+
+	protected void conductVotingRounds(Map<String, List<Integer>> candidatesWithBallotIDsMap){
+		 winnerCandidate = calculateWinner(candidatesWithBallotIDsMap);
+
+		while(winnerCandidate.isEmpty()){
+			io.printLine("No winner, re-assigning ballots");
+			io.printLine("Non-exhausted ballots :" + getNonExhaustedBallots());
+
+			Map<String, List<Integer>> reAssignedCandidatesMapWithBallots = handleBallotsWithMinimalVotes(candidatesWithBallotIDsMap);
+			winnerCandidate = calculateWinner(reAssignedCandidatesMapWithBallots);
 		}
-
 	}
 
 	private String calculateWinner(Map<String, List<Integer>> candidatesMapWithBallots) {
-		//(number of non-exhausted ballots / 2) + 1
 		String winnerCandidate = candidatesMapWithBallots.entrySet().stream()
-				.filter(entry -> entry.getValue().size() > nonExhaustedBallots / 2 + 1).map(x -> x.getKey())
+				.filter(entry -> entry.getValue().size() > getNonExhaustedBallots() / 2 + 1).map(x -> x.getKey())
 				.collect(Collectors.joining());
+
+		if(candidatesMapWithBallots.keySet().size() == 1){
+			winnerCandidate = candidatesMapWithBallots.keySet().stream().findFirst().get();
+		}
+
 		if(!winnerCandidate.isEmpty()){
-			System.out.println("Winner is candidate: " + winnerCandidate);
+			io.printLine("Winner is candidate: " + winnerCandidate);
 		}
 		return winnerCandidate;
 	}
 
-	private Map<String, List<Integer>> reAssignBallots(Map<String, List<Integer>> candidatesMapWithBallotsList) {
+	private Map<String, List<Integer>> handleBallotsWithMinimalVotes(Map<String, List<Integer>> candidatesWithBallotIDsMap) {
 		//find candidate with minimal ballots/votes
-		//what should happen if multiple ballots candidates are removed
+		int minimalVotes = getMinimalVotesCount(candidatesWithBallotIDsMap);
 
-		int minimalVotes = candidatesMapWithBallotsList
-				.entrySet().stream().min(comparingInt(e -> e.getValue().size())).get().getValue().size();
+		List<String> candidatesWithMinimalVotes = findCandidatesWithMinimalVotes(candidatesWithBallotIDsMap,
+				minimalVotes);
 
-		//find all candidates with minimal votes
-		List<String> candidatesWithMinimalVotes = candidatesMapWithBallotsList.entrySet().stream()
-				.filter(entry -> entry.getValue().size() == minimalVotes).map(x -> x.getKey())
-				.collect(Collectors.toList());
+		io.printLine("Amount of least votes:" +minimalVotes);
+		io.printLine("Candidate(s) with least votes:" +candidatesWithMinimalVotes);
 
-		System.out.println("Number least votes:" +minimalVotes);
-		System.out.println("Candidate(s) with least votes:" +candidatesWithMinimalVotes);
+		if(candidatesWithBallotIDsMap.keySet().size() == candidatesWithMinimalVotes.size()){
+			Random rand = new Random();
+			int randomNumber = rand.nextInt(candidatesWithMinimalVotes.size());
+			String candidateForElimination = candidatesWithMinimalVotes.get(randomNumber);
 
-		//get from ballots from candidate and re-assign them to next cancidate
-		for(String candidate : candidatesWithMinimalVotes){
+			io.printLine("Elliminating a random candidate and it's ballots: "+candidateForElimination);
 
-			List<Integer> tmp = new ArrayList<>();
-			tmp.addAll(candidatesMapWithBallotsList.get(candidate));
+			List<Integer> ballotsToBeRemoved = candidatesWithBallotIDsMap.get(candidateForElimination);
 
-			for(int ballotId : tmp){
-				// need to know where to re-assign the ballot, the next priority (can be non existing candidate)
-				Ballot ballot = ballotMap.get(ballotId);
+			for(Integer ballotId : ballotsToBeRemoved){
+				getBallotMap().remove(ballotId);
+				io.printLine("Elliminating ballot: " + ballotId);
+			}
 
-				if(ballot.isExhausted()){
-					ballotMap.keySet().remove(ballotId);
-					nonExhaustedBallots = ballotMap.keySet().size();
+			candidatesWithBallotIDsMap.remove(candidateForElimination);
+			candidatesWithMinimalVotes.remove(randomNumber);
+			setNonExhaustedBallots(getBallotMap().keySet().size());
+		}
+		io.printLine("Non-exhausted ballots :" + getNonExhaustedBallots());
+		//get from ballots from candidate and re-assign them to next candidate
+		reAssignBallots(candidatesWithBallotIDsMap, candidatesWithMinimalVotes);
+
+		return candidatesWithBallotIDsMap;
+	}
+
+	private void reAssignBallots(Map<String, List<Integer>> candidatesMapWithBallotsList,
+			List<String> candidatesWithMinimalVotes) {
+
+		io.printLine("******** Re-assigning ballots ********");
+		for (String candidate : candidatesWithMinimalVotes) {
+
+			List<Integer> ballotIds = new ArrayList<>(candidatesMapWithBallotsList.get(candidate));
+
+			for (int ballotId : ballotIds) {
+				//if last candidate remaining
+				if(getBallotMap().keySet().size() == 1){
 					continue;
+				}
+				// need to know where to re-assign the ballot, the next priority (can be non existing candidate)
+				Ballot ballot = getBallotMap().get(ballotId);
+
+				if (ballot.isExhausted(candidatesMapWithBallotsList.keySet())) {
+					removeBallotFromVoting(candidatesMapWithBallotsList, candidate, ballotId);
 				} else {
-					String nextCandidateForBallot = ballot.getNextPreferenceFromBallot();
-
-				//remove ballot from map with id:ballotId
-				candidatesMapWithBallotsList.get(candidate).removeIf(value -> value.equals(ballotId));
-
-				candidatesMapWithBallotsList.get(nextCandidateForBallot).add(ballotId);
-
-				if(candidatesMapWithBallotsList.get(candidate).isEmpty()){
-					System.out.println("Removed Candidate: " + candidate);
-					candidatesMapWithBallotsList.keySet().remove(candidate);
+					assignBallotToNextCandidate(candidatesMapWithBallotsList, candidate, ballotId, ballot);
+				}
+				if (candidatesMapWithBallotsList.get(candidate).isEmpty()) {
+					removeCandidateFromVoting(candidatesMapWithBallotsList, candidate);
 				}
 
-				}
 			}
 		}
-
-		return candidatesMapWithBallotsList;
 	}
 
-	//change initialization for firstprioritycandidates
-	private void findAllTopCandidatesFromBallots(Map<Integer, Ballot> ballotMap, Set<String> firstPriorityCandidates) {
-		ballotMap.values().stream().forEach(ballot -> firstPriorityCandidates.add(ballot.getCandidateWithFirstPriority()));
+	protected void removeCandidateFromVoting(Map<String, List<Integer>> candidateWithBallotIDsMap, String candidate) {
+		io.printLine("Removed Candidate: " + candidate + ". It has no active votes!");
+		candidateWithBallotIDsMap.keySet().remove(candidate);
 	}
 
-	//return the label of the winner
+	protected void assignBallotToNextCandidate(Map<String, List<Integer>> candidatesMapWithBallotsList,
+			String candidate, int ballotId, Ballot ballot) {
+		String nextCandidateForBallot = ballot
+				.getNextActiveCandidateFromBallot(candidatesMapWithBallotsList.keySet());
+
+		candidatesMapWithBallotsList.get(candidate).removeIf(value -> value.equals(ballotId));
+		io.printLine("Re-assigning ballot: "+ballotId+ " to Candidate: " + nextCandidateForBallot);
+
+		candidatesMapWithBallotsList.get(nextCandidateForBallot).add(ballotId);
+	}
+
+	protected void removeBallotFromVoting(Map<String, List<Integer>> candidatesMapWithBallotIDsMap, String candidate,
+			int ballotId) {
+		io.printLine("Ballot exhausted:" + ballotId);
+		getBallotMap().keySet().remove(ballotId);
+		candidatesMapWithBallotIDsMap.get(candidate).removeIf(value -> value.equals(ballotId));
+		setNonExhaustedBallots(getBallotMap().keySet().size());
+	}
+
+	protected List<String> findCandidatesWithMinimalVotes(Map<String, List<Integer>> candidatesMapWithBallotsList,
+			int minimalVotes) {
+		return candidatesMapWithBallotsList.entrySet().stream()
+					.filter(entry -> entry.getValue().size() == minimalVotes).map(x -> x.getKey())
+					.collect(Collectors.toList());
+	}
+
+	protected int getMinimalVotesCount(Map<String, List<Integer>> candidatesMapWithBallotsMap) {
+		return candidatesMapWithBallotsMap
+
+					.entrySet().stream().min(comparingInt(e -> e.getValue().size())).get().getValue().size();
+	}
+
+	protected List findAllTopCandidatesFromBallots() {
+		Set topCandidates = new HashSet<>();
+		getBallotMap().values().forEach(ballot -> topCandidates.add(ballot.getCandidateWithPriority(HIGHEST_VOTE)));
+		return new ArrayList<>(topCandidates);
+	}
+
+	public Map<Integer, Ballot> getBallotMap() {
+		return ballotMap;
+	}
+
+
+	public String getWinnerCandidate() {
+		return winnerCandidate;
+	}
+
+	public int getNonExhaustedBallots() {
+		return nonExhaustedBallots;
+	}
+
+	private void setNonExhaustedBallots(int nonExhaustedBallots) {
+		this.nonExhaustedBallots = nonExhaustedBallots;
+	}
+
 }
