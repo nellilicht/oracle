@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParseCandidates {
+public class InputFileHandler {
 	private static final int MAXIMUM_NUMBER_OF_CANDIDATES = 25;
 	private static final int MINIMUM_NUMBER_OF_CANDIDATES = 2;
 	private static final String ALPHABETH = "abcdefghijklmopqrstuvwxyz'";
 
-	public Map<String, String> parseCandidates(String fileName) throws FileNotFoundException, IllegalArgumentException {
+	public Map<String, String> parseInputFile(String fileName) throws FileNotFoundException, IllegalArgumentException {
 		List<String> candidates = readCandidatesFromFile(fileName);
 		return labelCandidates(candidates);
 	}
@@ -24,7 +24,7 @@ public class ParseCandidates {
 	protected List<String> readCandidatesFromFile(String fileName) throws FileNotFoundException {
 		List<String> list = new ArrayList<>();
 
-		URL fileToRead = ParseCandidates.class.getResource(fileName);
+		URL fileToRead = InputFileHandler.class.getResource(fileName);
 
 		if(fileToRead == null){ throw new FileNotFoundException();
 		}
