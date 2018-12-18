@@ -7,11 +7,10 @@ import java.util.Set;
 
 public class UserInputHandler {
 
-	//user input = ballot and results, list or map
 	private ConsoleIO io;
 	private Set<String> validCandidatesLabels;
 	private Map<String, String> labelsAndCandidatesMap;
-	private boolean run = true;
+	private boolean runnable = true;
 
 	private Map<Integer, Ballot> ballotMap = new HashMap<>();
 	private VoteHandler voteHandler;
@@ -26,12 +25,12 @@ public class UserInputHandler {
 	}
 
 	protected void readInput() throws IllegalArgumentException{
-		while (run) {
+		while (isRunnable()) {
 			displayCandidatesList(getLabelsAndCandidatesMap());
 
 			io.printLine("Please insert the labels of candidates in the order of your preference!");
 
-			userInput = io.getUserInput(); // Read first time
+			userInput = io.getUserInput();
 
 			char[] votes = parseInputToUniqueLabels(userInput);
 
@@ -41,7 +40,7 @@ public class UserInputHandler {
 					continue;
 				}
 				getVoteHandler().countVotes(getBallotMap());
-				run = false;
+				setRunnable(false);
 			} else {
 
 
@@ -57,7 +56,7 @@ public class UserInputHandler {
 
 				}
 
-				run = enterAnotherVote(io);
+				runnable = enterAnotherVote(io);
 
 			}
 		}
@@ -66,7 +65,7 @@ public class UserInputHandler {
 
 	}
 
-	protected boolean enterAnotherVote(ConsoleIO io) {
+	protected boolean enterAnotherVote(ConsoleIO io) throws IllegalArgumentException{
 		while (true) {
 			io.printLine("Enter another vote? [Y/TALLY]");
 			String addVote = io.getUserInput();
@@ -139,5 +138,15 @@ public class UserInputHandler {
 	public VoteHandler getVoteHandler() {
 		return voteHandler;
 	}
+
+	public boolean isRunnable() {
+		return runnable;
+	}
+
+
+	void setRunnable(boolean runnable) {
+		this.runnable = runnable;
+	}
+
 
 }
