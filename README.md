@@ -1,6 +1,7 @@
 # oracle
 
 Introduction
+
 Program is doing the following:
 1. It takes an input file and parses the file, resulting in a list of alphabetically labelled candidates; (min 2 candidates, max 25 candidates)
 2. List of the candidates is read from resources/candidates.txt
@@ -14,9 +15,11 @@ Program is doing the following:
 7. Winner candidate is displayed to the user;
 
 Code and style
+
 My goal was to use Java 8 possibilites. I chose collections by their features (e.g keeping an order), because I used maps and lists for storing user input and calculating the winner candidate. I created small methods with minimal responsibilities and kept naming as descriptive as possible.
 
 Architecture
+
 I chose git for versioning, Maven to resolve dependencies, test and run program, Mockito for testing, Jacoco for test results. My goal was to divide the program logic into small logical pieces and keep the responsibilites clear. I tried to extract the dependencies so that I could test without them. (e.g Scanner). 
 
 Running the program (from Command line)
