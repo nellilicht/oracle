@@ -24,7 +24,9 @@ I chose git for versioning, Maven to resolve dependencies, test and run program,
 
 ## Running the program (from Command line) ##
 
-* Navigate to folder, where pom.xml is located
+1. Checkout the code 
+2. Navigate to folder, where pom.xml is located
+3. Run commands
 
     * **mvn compile**
     * **(optional) mvn test**
