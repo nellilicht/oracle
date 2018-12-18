@@ -1,20 +1,31 @@
 import domain.Ballot;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import util.FakeIO;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.mockito.Mockito.spy;
 
+@RunWith(MockitoJUnitRunner.class)
 public class VoteHandlerIntegrationTest {
 	FakeIO fakeIO = new FakeIO();
 	Map testBallotMap;
+	VoteHandler voteHandler;
+
+	@Before
+	public void setUp(){
+		voteHandler = spy(new VoteHandler(fakeIO));
+	}
 
 
 	@Test
 	public void voteCalculationShouldProvideCorrectWinner(){
-		VoteHandler voteHandler = new VoteHandler(fakeIO);
 
 		testBallotMap = new HashMap<Integer, Ballot>(){{
 			put(1, new Ballot(new char[]{'A', 'B'}));
@@ -29,8 +40,6 @@ public class VoteHandlerIntegrationTest {
 
 	@Test
 	public void voteCalculationShouldReturnRandomWinnerForEqualVotesCandidates(){
-		VoteHandler voteHandler = new VoteHandler(fakeIO);
-
 		Map testBallotMap = new HashMap<Integer, Ballot>(){{
 			put(1, new Ballot(new char[]{'A'}));
 			put(2, new Ballot(new char[]{'B'}));
@@ -45,8 +54,6 @@ public class VoteHandlerIntegrationTest {
 
 	@Test
 	public void voteCalculationShouldAssignBallotsToExistingCandidates(){
-		VoteHandler voteHandler = new VoteHandler(fakeIO);
-
 		testBallotMap = new HashMap<Integer, Ballot>(){{
 			put(1, new Ballot(new char[]{'A','D','C'}));
 			put(2, new Ballot(new char[]{'A','D','C'}));
