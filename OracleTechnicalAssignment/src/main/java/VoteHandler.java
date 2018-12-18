@@ -111,7 +111,7 @@ public class VoteHandler {
 
 		if(candidatesWithBallotIDsMap.keySet().size() == candidatesWithMinimalVotes.size()
 				&& candidatesWithBallotIDsMap.keySet().size() > 1){
-			elliminateCandidate(candidatesWithBallotIDsMap, candidatesWithMinimalVotes);
+			eliminateCandidate(candidatesWithBallotIDsMap, candidatesWithMinimalVotes);
 		}
 		//get from ballots from candidate and re-assign them to next candidate
 		else if(candidatesWithBallotIDsMap.keySet().size() > 1){
@@ -122,20 +122,19 @@ public class VoteHandler {
 		return candidatesWithBallotIDsMap;
 	}
 
-	protected void elliminateCandidate(Map<String, List<Integer>> candidatesWithBallotIDsMap,
+	protected void eliminateCandidate(Map<String, List<Integer>> candidatesWithBallotIDsMap,
 			List<String> candidatesWithMinimalVotes) {
 		int randomNumber = getRand().nextInt(candidatesWithMinimalVotes.size());
 		String candidateForElimination = candidatesWithMinimalVotes.get(randomNumber);
 
-		io.printLine("Elliminating a random candidate and it's ballots: "+candidateForElimination);
+		io.printLine("Eliminating a random candidate and it's ballots: "+candidateForElimination);
 
 		List<Integer> ballotsToBeRemoved = candidatesWithBallotIDsMap.get(candidateForElimination);
 
 		for(Integer ballotId : ballotsToBeRemoved){
-			io.printLine("Elliminating ballot: " + ballotId);
+			io.printLine("Eliminating ballot: " + ballotId);
 			getBallotMap().remove(ballotId);
 		}
-			io.printLine("" + randomNumber);
 		candidatesWithBallotIDsMap.remove(candidateForElimination);
 		candidatesWithMinimalVotes.remove(randomNumber);
 		setNonExhaustedBallots(getBallotMap().keySet().size());

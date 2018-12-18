@@ -66,14 +66,14 @@ public class VoteHandlerTest {
 	}
 
 	@Test
-	public void candidateShouldBeElliminatedFromVoting(){
+	public void candidateShouldBeEliminatedFromVoting(){
 		testCandidatesWithMinimalVotes = new ArrayList<>(Arrays.asList("B", "C", "E"));
 
 		Random rand = mock(Random.class);
 		doReturn(rand).when(voteHandler).getRand();
 		doReturn(2).when(rand).nextInt(anyInt());
 
-		voteHandler.elliminateCandidate(testCandidatesAndBallotIDsMap, testCandidatesWithMinimalVotes);
+		voteHandler.eliminateCandidate(testCandidatesAndBallotIDsMap, testCandidatesWithMinimalVotes);
 
 		assertEquals(2, testCandidatesWithMinimalVotes.size());
 		assertNull(testCandidatesAndBallotIDsMap.get("E"));
@@ -83,22 +83,22 @@ public class VoteHandlerTest {
 
 
 	@Test
-	public void randomCandidateElliminationShouldBeCalledWhenAllVotesAreDividedEqually(){
+	public void randomCandidateEliminationShouldBeCalledWhenAllVotesAreDividedEqually(){
 		doReturn(1).when(voteHandler).getMinimalVotesCount(anyMap());
 		doReturn(Arrays.asList("A", "B", "C", "E")).when(voteHandler).findCandidatesWithMinimalVotes(anyMap(), anyInt());
-		doNothing().when(voteHandler).elliminateCandidate(anyMap(),anyList());
+		doNothing().when(voteHandler).eliminateCandidate(anyMap(),anyList());
 
 		voteHandler.handleBallotsWithMinimalVotes(testCandidatesAndBallotIDsMap);
-		verify(voteHandler, times(1)).elliminateCandidate(anyMap(),anyList());
+		verify(voteHandler, times(1)).eliminateCandidate(anyMap(),anyList());
 		verify(voteHandler, times(0)).reAssignBallots(anyMap(),anyList());
 	}
 
 	@Test
-	public void randomCandidateElliminationShouldNotBeCalled(){
+	public void randomCandidateEliminationShouldNotBeCalled(){
 		doReturn(1).when(voteHandler).getMinimalVotesCount(anyMap());
 		when(voteHandler.findCandidatesWithMinimalVotes(anyMap(), anyInt())).thenReturn(Arrays.asList("A"));
 		voteHandler.handleBallotsWithMinimalVotes(reAssignedCandidatesMapWithBallots);
-		verify(voteHandler, times(0)).elliminateCandidate(anyMap(),anyList());
+		verify(voteHandler, times(0)).eliminateCandidate(anyMap(),anyList());
 	}
 
 	@Test

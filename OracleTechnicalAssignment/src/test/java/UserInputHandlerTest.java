@@ -152,7 +152,7 @@ public class UserInputHandlerTest {
 	}
 
 	@Test
-	public void shouldElliminateWhitespaceValuesFromInputArray(){
+	public void shouldEliminateWhitespaceValuesFromInputArray(){
 		UserInputHandler iph = new UserInputHandler(testCandidatesList,fakeIO);
 		assertArrayEquals(new char[] {'A', 'X', 'B'}, iph.parseInputToUniqueLabels("aa xx bb"));
 	}
