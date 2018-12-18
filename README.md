@@ -4,7 +4,7 @@
 
 Program is doing the following:
 1. It takes an input file and parses the file, resulting in a list of alphabetically labelled candidates; (min 2 candidates, max 25 candidates)
-2. List of the candidates is read from resources/candidates.txt
+    1. List of the candidates is read from resources/candidates.txt
 3. All options are displayed to the user and user input is requested (one or more times);
     1. User has to insert the lables of their preference;
 4. User input is parsed and data is saved;
